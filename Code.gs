@@ -48,14 +48,17 @@ function optimizeMenuCall() {
   runOptimizeLoop(current_sheet, opti_range, target_cell);
 }
 
-var bake_cycles = 500;
-var bake_mod = .1;
+var bake_cycles = 20;
+var bake_mod_start = .2;
+var bake_mod_reduce = .05;
 
 function runOptimizeLoop(sheet, src_range, target) {
   var prev_src = src_range.getValues();
   var prev_target = target.getValue();
   
-  for(var i=0; i<bake_cycles; i++) {
+  var bake_mod = bake_mod_start;
+  
+  for(var i=0; bake_mod > 0; i++) {
     var new_src = [];
     for(var ii = 0; ii < prev_src.length; ii++) {
       new_src.push([]);
@@ -70,8 +73,15 @@ function runOptimizeLoop(sheet, src_range, target) {
     var new_target = target.getValue();
     
     if (new_target < prev_target) {
+      i = 0;
+      
       prev_target = new_target;
       prev_src = new_src;
+    } else {
+      if (i >= bake_cycles) {
+        i = 0;
+        bake_mod -= bake_mod_reduce;
+      }
     }
   }
   
